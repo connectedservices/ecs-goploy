@@ -1,5 +1,5 @@
 # ecs-goploy
-[![CircleCI](https://circleci.com/gh/connectedservices/ecs-goploy.svg?style=svg)](https://circleci.com/gh/connectedservices/ecs-goploy)
+[![CircleCI](https://circleci.com/gh/connectedservices/ecs-goploy.svg?style=shield)](https://circleci.com/gh/connectedservices/ecs-goploy)
 
 `ecs-goploy` is a re-implementation of [ecs-deploy](https://github.com/silinternational/ecs-deploy) in Golang.
 
