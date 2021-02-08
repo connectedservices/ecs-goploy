@@ -68,7 +68,7 @@ workflows:
             branches:
               ignore:
                 - master
-      - manual_publish:
+      - publish:
           context: org-global
           requires:
             - approve_publish
