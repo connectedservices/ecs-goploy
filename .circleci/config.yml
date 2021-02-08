@@ -11,6 +11,8 @@ jobs:
     docker:
       - image: golang:1.13-alpine
         <<: *docker-auth
+        environment:
+          VERSION: v0.5.1
     steps:
       - run:
           name: Install dependencies
@@ -21,8 +23,8 @@ jobs:
       - run:
           name: Build Go package
           command: |
-            make linux
-            aws s3 cp packages/ecs-goploy_*_linux_amd64.zip s3://${ARTIFACTS_BUCKET}/ecs-goploy/
+            make linux VERSION=$VERSION
+            aws s3 cp packages/ecs-goploy_${VERSION}_linux_amd64.zip s3://${ARTIFACTS_BUCKET}/ecs-goploy/
 
 workflows:
   version: 2
