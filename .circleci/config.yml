@@ -41,6 +41,7 @@ jobs:
       - image: golang:1.13-alpine
         <<: *docker-auth
     steps:
+      - checkout
       - attach_workspace:
           at: ./
       - run:
