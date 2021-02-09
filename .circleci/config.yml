@@ -38,7 +38,7 @@ jobs:
 
   publish:
     docker:
-      - image: golang:1.13-alpine
+      - image: python:3.9-alpine
         <<: *docker-auth
     steps:
       - checkout
@@ -47,7 +47,6 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add -U py-pip
             pip install awscli
       - run:
           name: Publish artifact
