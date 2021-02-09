@@ -181,7 +181,7 @@ func (s *Service) checkDeployments(deployments []*ecs.Deployment, newTaskDefinit
 		return false
 	}
 	for _, deploy := range deployments {
-		if *deploy.TaskDefinition == *newTaskDefinition.TaskDefinitionArn && *deploy.Status == "PRIMARY" && *deploy.DesiredCount == *deploy.RunningCount {
+		if *deploy.TaskDefinition == *newTaskDefinition.TaskDefinitionArn && *deploy.Status == "PRIMARY" && *deploy.DesiredCount == *deploy.RunningCount && *deploy.RolloutState == "COMPLETED" {
 			return true
 		}
 	}

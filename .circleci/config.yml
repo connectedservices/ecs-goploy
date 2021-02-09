@@ -1,0 +1,85 @@
+---
+version: 2.1
+
+docker-auth: &docker-auth
+  auth:
+    username: $DOCKERHUB_USERNAME
+    password: $DOCKERHUB_PASSWORD
+
+jobs:
+  build:
+    docker:
+      - image: golang:1.13-alpine
+        <<: *docker-auth
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ .Branch }}-{{ checksum "go.sum" }}
+            - go-mod-v1-{{ .Branch }}-
+            - go-mod-v1-
+      - run:
+          name: Install dependencies
+          command: |
+            apk add -U zip make
+      - run:
+          name: Build Go package
+          command: |
+            VERSION=$(grep ecs-goploy cmd/version.go | awk -F\" '{print $2}' | awk '{print $2}')
+            make linux VERSION=$VERSION
+      - save_cache:
+          key: go-mod-v1-{{ .Branch }}-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - "packages/*"
+
+  publish:
+    docker:
+      - image: python:3.9-alpine
+        <<: *docker-auth
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Install dependencies
+          command: |
+            pip install awscli
+      - run:
+          name: Publish artifact
+          command: |
+            VERSION=$(grep ecs-goploy cmd/version.go | awk -F\" '{print $2}' | awk '{print $2}')
+            aws s3 cp packages/ecs-goploy_${VERSION}_linux_amd64.zip s3://${ARTIFACTS_BUCKET}/ecs-goploy/
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build:
+          context: org-global
+      - approve_publish:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              ignore:
+                - master
+      - publish:
+          context: org-global
+          requires:
+            - approve_publish
+          filters:
+            branches:
+              ignore:
+                - master
+      - publish:
+          context: org-global
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
